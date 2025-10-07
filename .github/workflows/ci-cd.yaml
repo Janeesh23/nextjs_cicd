@@ -59,6 +59,6 @@ jobs:
 
           kubectl config use-context minikube
           kubectl apply -f kubernetes/
-          kubectl rollout status deployment/nextjs-app -n default
+          kubectl rollout status deployment/nextjs-app -n application
 
           echo "Deployment completed successfully!"
