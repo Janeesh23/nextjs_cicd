@@ -1,0 +1,64 @@
+name: CI/CD pipeline for Next.js application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+    env:
+      IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/nextjs-app
+      IMAGE_TAG: ${{ github.run_number }}
+
+    steps:
+
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: setting up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Build Docker iamge
+        run: |
+          echo "Building image: $IMAGE_NAME:$IMAGE_TAG"
+
+          docker build -t $IMAGE_NAME:$IMAGE_TAG .        
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Docker image to GHCR
+        run: |
+          echo "Pushing image: $IMAGE_NAME:$IMAGE_TAG"
+
+          docker push $IMAGE_NAME:$IMAGE_TAG
+
+
+      - name: Update Kubernetes manifest with new image
+        run: |
+          echo "Updating deployment.yaml with image: $IMAGE_NAME:$IMAGE_TAG"
+
+          sed -i "s|image:.*|image: $IMAGE_NAME:$IMAGE_TAG|g" kubernetes/deployment.yaml
+
+          echo "Updated deployment.yaml content:"
+          grep "image:" kubernetes/deployment.yaml
+
+
+      - name: Deploy to Minikube
+        run: |
+          echo "Deploying application to Minikube using updated manifest"
+
+          kubectl config use-context minikube
+          kubectl apply -f kubernetes/
+          kubectl rollout status deployment/nextjs-app -n default
+
+          echo "Deployment completed successfully!"
