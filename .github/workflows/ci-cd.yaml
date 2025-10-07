@@ -23,7 +23,7 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: Build Docker iamge
+      - name: Build Docker image
         run: |
           echo "Building image: $IMAGE_NAME:$IMAGE_TAG"
 
