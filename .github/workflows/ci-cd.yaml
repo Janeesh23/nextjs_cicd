@@ -34,7 +34,7 @@ jobs:
         with:
           registry: ghcr.io
           username: janeesh23
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Push Docker image to GHCR
         run: |
