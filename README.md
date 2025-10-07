@@ -90,7 +90,7 @@ kubectl get svc -n application
 #Copy the EXTERNAL-IP from the output above and open it in your browser:
 http://<external-ip>
 
-# For context: My Minikube cluster was running on an Ubunut WSL
+# For context: My Minikube cluster was running on an Ubuntu WSL
 ```
 
 ## CI/CD Pipeline (GitHub Actions)
